@@ -1,0 +1,36 @@
+html,body {
+    margin: 0;
+    padding: 0;
+}
+
+/* slider */
+.custom-slider {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 800px;
+}
+.custom-slider ,
+.custom-slider * {
+    margin: 0;
+    padding: 0;
+}
+.custom-slider-inner {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+.custom-slider, .custom-slide, img {
+    user-select: none; /* テキストや画像の選択を無効化 */
+    -webkit-user-drag: none; /* 画像のドラッグを無効化（Webkit系ブラウザ） */
+}
+/* slider */
+
+
+
+img {
+    width: 100%;
+    height: auto;
+}
