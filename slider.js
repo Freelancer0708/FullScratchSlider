@@ -30,10 +30,7 @@ window.addEventListener("load", () => {
     let translateX = 0;
     let currentSlide = 1;
     let isDragging = false;
-    let isInfiniteSliderActivePrev = false;
-    let isInfiniteSliderActiveNext = false;
     let infiniteX = 0;
-    let infiniteLength = 0;
     
 
     // スライドの作成後の設定
@@ -52,19 +49,7 @@ window.addEventListener("load", () => {
     // 無限スライドの設定
     const isInfinite = slider.getAttribute("data-infinite") === "true";
     // slider-inner の幅をスライド数で割り、スライドの移動幅を計算
-    const sliderOffsetWidth = sliderInner.offsetWidth;
     const slideWidth = sliderInner.offsetWidth / slides.length;
-    infiniteX = slideWidth * -2;
-    if(isInfinite) {
-      const sliderInnerItems = Array.from(sliderInner.children);
-      const firstCopies = sliderInnerItems.slice(0, 2).map(slide => slide.cloneNode(true));
-      const lastCopies = sliderInnerItems.slice(-2).map(slide => slide.cloneNode(true));
-      firstCopies.forEach(copy => sliderInner.appendChild(copy));
-      lastCopies.reverse().forEach(copy => sliderInner.insertBefore(copy, sliderInner.firstChild));
-      currentSlide = 3;
-      infiniteLength = 2;
-      sliderInner.style.transform = `translateX(${infiniteX}px)`;
-    }
 
     // スライドの挙動
     // マウスをクリックしている間に起こる関数
@@ -76,42 +61,24 @@ window.addEventListener("load", () => {
         // 現在のスライドの番号(currentSlide) を更新
         currentSlide -= Math.sign(deltaX);
         // 現在のスライドの番号(currentSlide) が 1以上 スライドの枚数(slides.length) 以下の時
-        // if (!isInfinite) {
-          if (currentSlide >= 1 && currentSlide <= slides.length) {
-            // スライダーを1枚分移動させる(targetX) += 1枚のスライド幅(slideWidth) * 移動させる方向(Math.sign(deltaX))
-            targetX += slideWidth * Math.sign(deltaX);
-            // スライドが移動したら、初期位置を、現在のマウスの位置に更新する(startX = e.clientX)
-            startX = e.clientX;
-          
-          } else if (isInfinite && currentSlide < 3) {
-            currentSlide = 3;
-          } else if (currentSlide > slides.length + 2) {
-            currentSlide = slides.length + 2;
-          // 現在のスライドの番号(currentSlide) が 1より小さい時
-          } else if (currentSlide < 1) {
-            // 現在のスライドの番号(currentSlide) を1に設定
-            currentSlide = 1;
-          // 現在のスライドの番号(currentSlide) が スライドの枚数(slides.length) より大きい時
-          } else if (currentSlide > slides.length) {
-            // 現在のスライドの番号(currentSlide) をスライドの枚数(slides.length) に設定
-            currentSlide = slides.length;
-          }
-        // } else {
-          // targetX += slideWidth * Math.sign(deltaX);
-          // startX = e.clientX;
-          // if (currentSlide < 1 + infiniteLength && Math.sign(deltaX) > 0) {
-          //   targetX = slideWidth;
-          //   isInfiniteSliderActivePrev = true;
-          // } else if (currentSlide > slides.length + infiniteLength && Math.sign(deltaX) < 0) {
-          //   targetX = -sliderOffsetWidth + oneslideWidth * 2;
-          //   isInfiniteSliderActiveNext = true;
-          // }
-        // }
+        if (currentSlide >= 1 && currentSlide <= slides.length) {
+          // スライダーを1枚分移動させる(targetX) += 1枚のスライド幅(slideWidth) * 移動させる方向(Math.sign(deltaX))
+          targetX += slideWidth * Math.sign(deltaX);
+          // スライドが移動したら、初期位置を、現在のマウスの位置に更新する(startX = e.clientX)
+          startX = e.clientX;
+        // 現在のスライドの番号(currentSlide) が 1より小さい時
+        } else if (currentSlide < 1) {
+          // 現在のスライドの番号(currentSlide) を1に設定
+          currentSlide = 1;
+        // 現在のスライドの番号(currentSlide) が スライドの枚数(slides.length) より大きい時
+        } else if (currentSlide > slides.length) {
+          // 現在のスライドの番号(currentSlide) をスライドの枚数(slides.length) に設定
+          currentSlide = slides.length;
+        }
       }
     }
     // アニメーション関数
     function animate() {
-      const sliderInnerItems = Array.from(sliderInner.children);
       // しきい値(閾値)の設定
       const threshold = 5;
       // 現在のスライド位置(currentX) が 目標の位置(targetX) まで 閾値(threshold) よりも小さい時
@@ -119,41 +86,15 @@ window.addEventListener("load", () => {
         // 現在のスライド位置(currentX) を 目標の位置(targetX) まで 動かす
         currentX = targetX;
         // スライド位置(currentX) を 動かす
-        translateX = currentX + infiniteX;
+        translateX = currentX;
         sliderInner.style.transform = `translateX(${translateX}px)`;
-        console.log("currentX:"+ currentX);
-        console.log("infiniteX:"+ infiniteX);
-        console.log("currentSlide:"+ currentSlide);
-        console.log("translateX:"+ translateX);
-        console.log("oneslideWidth:"+ -oneslideWidth);
-        if(isInfinite && translateX > -oneslideWidth * 2) {
-          const prevSlide = sliderInnerItems.slice(-1).map(slide => slide.cloneNode(true));
-          prevSlide.reverse().forEach(copy => sliderInner.insertBefore(copy, sliderInner.firstChild));
-          sliderInner.lastElementChild.remove();
-          currentSlide = 3;
-          translateX -= oneslideWidth;
-          sliderInner.style.transform = `translateX(${translateX}px)`;
-          console.log("Prev currentX:"+ currentX);
-          console.log("Prev infiniteX:"+ infiniteX);
-          console.log("Prev currentSlide:"+ currentSlide);
-          console.log("Prev translateX:"+ translateX);
-          console.log("Prev oneslideWidth:"+ -oneslideWidth);
-        } else if (isInfinite && translateX < infiniteX - sliderOffsetWidth + slideWidth) {
-          const nextSlide = sliderInnerItems.slice(0, 1).map(slide => slide.cloneNode(true));
-          nextSlide.forEach(copy => sliderInner.appendChild(copy));
-          sliderInner.firstElementChild.remove();
-          targetX = infiniteX - sliderOffsetWidth + slideWidth;
-          currentX = infiniteX - sliderOffsetWidth + slideWidth;
-          translateX = infiniteX - sliderOffsetWidth + slideWidth;
-          sliderInner.style.transform = `translateX(${translateX}px)`;
-        }
         // クリックが継続しているか判定する
         if (!isDragging) return;
       } else {
         // 現在のスライド位置(currentX) を 目標の位置(targetX) まで 少しずつ動かす
         currentX += (targetX - currentX) * 0.12;
         // スライド位置(currentX) を 動かす
-        translateX = currentX + infiniteX;
+        translateX = currentX;
         sliderInner.style.transform = `translateX(${translateX}px)`;
       }
       // 次の画面更新でanimateを再度実行
