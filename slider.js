@@ -1,3 +1,6 @@
+import { Show } from './show.js';
+import { Infinite } from './infinite.js';
+
 window.addEventListener("load", () => {
   const classNames = {
     slider: "custom-slider",
@@ -30,26 +33,24 @@ window.addEventListener("load", () => {
     let translateX = 0;
     let currentSlide = 1;
     let isDragging = false;
-    let infiniteX = 0;
-    
 
     // スライドの作成後の設定
     const sliderInner = slider.querySelector(`.${classNames.sliderInner}`);
     const slides = sliderInner.querySelectorAll(`.${classNames.slide}`);
 
-    // スライドの1画面の表示枚数
+    // スライドの1画面の表示枚数の設定
     let slidesToShow = parseInt(slider.getAttribute("data-show")) || 1;
-    if(slidesToShow <= 0) {slidesToShow = 1;}
-    if(slidesToShow > slides.length) {slidesToShow = slides.length;}
+    if (slidesToShow != 1) { slidesToShow = Show(slidesToShow,slides); };
     const oneslideWidth = sliderInner.offsetWidth / slidesToShow;
-    slides.forEach((slideitem) => {
-      slideitem.style.width = `${oneslideWidth}px`;
-    });
+    slides.forEach((slideitem) => { slideitem.style.width = `${oneslideWidth}px`; });
+    console.log("show:"+ slidesToShow);
+
+    // slider-inner の幅をスライド数で割り、スライドの移動幅を計算
+    const slideWidth = sliderInner.offsetWidth / slides.length;
 
     // 無限スライドの設定
     const isInfinite = slider.getAttribute("data-infinite") === "true";
-    // slider-inner の幅をスライド数で割り、スライドの移動幅を計算
-    const slideWidth = sliderInner.offsetWidth / slides.length;
+    if (isInfinite) { ({currentSlide,targetX,currentX,translateX} = Infinite(isInfinite,oneslideWidth,sliderInner)); };
 
     // スライドの挙動
     // マウスをクリックしている間に起こる関数
@@ -110,6 +111,11 @@ window.addEventListener("load", () => {
       requestAnimationFrame(animate);
       // マウスが動いたらonMouseMoveを実行
       document.addEventListener("mousemove", onMouseMove);
+      console.log("startX:"+startX);
+      console.log("targetX:"+targetX);
+      console.log("currentX:"+currentX);
+      console.log("translateX:"+translateX);
+      console.log("currentSlide:"+currentSlide);
       // クリックを離した時
       document.addEventListener("mouseup", onMouseUp);
     });
