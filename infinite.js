@@ -30,7 +30,6 @@ export const InfiniteSlide = (isInfinite,targetX,slideWidth,deltaX,startX,e) => 
     return {targetX,startX};
 };
 
-
 export const InfiniteLast = (isInfinite,currentSlide,currentX,targetX,translateX,slider,sliderInner,slideWidth) => {
     console.log("InfiniteLast:" + isInfinite);
     const classNames = {

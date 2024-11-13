@@ -43,7 +43,6 @@ window.addEventListener("load", () => {
     if (slidesToShow != 1) { slidesToShow = Show(slidesToShow,slides); };
     const oneslideWidth = sliderInner.offsetWidth / slidesToShow;
     slides.forEach((slideitem) => { slideitem.style.width = `${oneslideWidth}px`; });
-    console.log("show:"+ slidesToShow);
 
     // slider-inner の幅をスライド数で割り、スライドの移動幅を計算
     const slideWidth = sliderInner.offsetWidth / slides.length;
@@ -57,7 +56,7 @@ window.addEventListener("load", () => {
     function onMouseMove(e) {
       // 移動距離(deltaX) = クリックしながら移動したマウスの位置(e.clientX) - クリックし始めた位置(startX)
       const deltaX = e.clientX - startX;
-      // 移動距離の絶対値(Math.abs(deltaX)) が、スライド幅の4/5(sliderInner.offsetWidth * 4 / 5) より大きい時
+      // 移動距離の絶対値(Math.abs(deltaX)) が、スライド幅の2.5 / 5(slider.offsetWidth * 2.5 / 5) より大きい時
       if (Math.abs(deltaX) >= slider.offsetWidth * 2.5 / 5) {
         // 現在のスライドの番号(currentSlide) を更新
         currentSlide -= Math.sign(deltaX);
@@ -117,11 +116,6 @@ window.addEventListener("load", () => {
       requestAnimationFrame(animate);
       // マウスが動いたらonMouseMoveを実行
       document.addEventListener("mousemove", onMouseMove);
-      console.log("startX:"+startX);
-      console.log("targetX:"+targetX);
-      console.log("currentX:"+currentX);
-      console.log("translateX:"+translateX);
-      console.log("currentSlide:"+currentSlide);
       // クリックを離した時
       document.addEventListener("mouseup", onMouseUp);
     });
