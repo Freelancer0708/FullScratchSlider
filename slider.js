@@ -1,5 +1,5 @@
 import { Show } from './show.js';
-import { Infinite } from './infinite.js';
+import { InfiniteIndex, InfiniteSlide, InfiniteLast } from './infinite.js';
 
 window.addEventListener("load", () => {
   const classNames = {
@@ -50,7 +50,7 @@ window.addEventListener("load", () => {
 
     // 無限スライドの設定
     const isInfinite = slider.getAttribute("data-infinite") === "true";
-    if (isInfinite) { ({currentSlide,targetX,currentX,translateX} = Infinite(isInfinite,oneslideWidth,sliderInner)); };
+    if (isInfinite) { ({currentSlide,targetX,currentX,translateX} = InfiniteIndex(isInfinite,oneslideWidth,sliderInner)); };
 
     // スライドの挙動
     // マウスをクリックしている間に起こる関数
@@ -58,23 +58,28 @@ window.addEventListener("load", () => {
       // 移動距離(deltaX) = クリックしながら移動したマウスの位置(e.clientX) - クリックし始めた位置(startX)
       const deltaX = e.clientX - startX;
       // 移動距離の絶対値(Math.abs(deltaX)) が、スライド幅の4/5(sliderInner.offsetWidth * 4 / 5) より大きい時
-      if (Math.abs(deltaX) >= slider.offsetWidth * 2 / 5) {
+      if (Math.abs(deltaX) >= slider.offsetWidth * 2.5 / 5) {
         // 現在のスライドの番号(currentSlide) を更新
         currentSlide -= Math.sign(deltaX);
-        // 現在のスライドの番号(currentSlide) が 1以上 スライドの枚数(slides.length) 以下の時
-        if (currentSlide >= 1 && currentSlide <= slides.length) {
-          // スライダーを1枚分移動させる(targetX) += 1枚のスライド幅(slideWidth) * 移動させる方向(Math.sign(deltaX))
-          targetX += slideWidth * Math.sign(deltaX);
-          // スライドが移動したら、初期位置を、現在のマウスの位置に更新する(startX = e.clientX)
-          startX = e.clientX;
-        // 現在のスライドの番号(currentSlide) が 1より小さい時
-        } else if (currentSlide < 1) {
-          // 現在のスライドの番号(currentSlide) を1に設定
-          currentSlide = 1;
-        // 現在のスライドの番号(currentSlide) が スライドの枚数(slides.length) より大きい時
-        } else if (currentSlide > slides.length) {
-          // 現在のスライドの番号(currentSlide) をスライドの枚数(slides.length) に設定
-          currentSlide = slides.length;
+
+        if (isInfinite) {
+          ({targetX,startX} = InfiniteSlide(isInfinite,targetX,slideWidth,deltaX,startX,e));
+        } else {
+          // 現在のスライドの番号(currentSlide) が 1以上 スライドの枚数(slides.length) 以下の時
+          if (currentSlide >= 1 && currentSlide <= slides.length) {
+            // スライダーを1枚分移動させる(targetX) += 1枚のスライド幅(slideWidth) * 移動させる方向(Math.sign(deltaX))
+            targetX += slideWidth * Math.sign(deltaX);
+            // スライドが移動したら、初期位置を、現在のマウスの位置に更新する(startX = e.clientX)
+            startX = e.clientX;
+          // 現在のスライドの番号(currentSlide) が 1より小さい時
+          } else if (currentSlide < 1) {
+            // 現在のスライドの番号(currentSlide) を1に設定
+            currentSlide = 1;
+          // 現在のスライドの番号(currentSlide) が スライドの枚数(slides.length) より大きい時
+          } else if (currentSlide > slides.length) {
+            // 現在のスライドの番号(currentSlide) をスライドの枚数(slides.length) に設定
+            currentSlide = slides.length;
+          }
         }
       }
     }
@@ -89,6 +94,7 @@ window.addEventListener("load", () => {
         // スライド位置(currentX) を 動かす
         translateX = currentX;
         sliderInner.style.transform = `translateX(${translateX}px)`;
+        if (isInfinite) { ({currentSlide,targetX,currentX,translateX} = InfiniteLast(isInfinite,currentSlide,currentX,targetX,translateX,slider,sliderInner,slideWidth)); };
         // クリックが継続しているか判定する
         if (!isDragging) return;
       } else {
